@@ -2,14 +2,14 @@
 
 #Schemas
 
-##Users:
+#Users:
 *"id"
 *"username"
 *"email"
 *"name"
 "password"
 
-##Posts:
+#Posts:
 *"id"
 *"title"
 *"description"
