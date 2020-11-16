@@ -2,7 +2,7 @@
 
 #Schemas
 
-Users:
+Users:{
 "id"
 "username"
 "email"
@@ -16,7 +16,7 @@ Posts:
 "date"
 "imgSrc"
 "user_id"
-
+}
 #API Requests
 
 GET
