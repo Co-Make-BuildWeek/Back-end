@@ -17,7 +17,7 @@
 * "imgSrc"
 * "user_id"
 
-## API Requests
+# API Requests
 
 ### GET
 * /users
