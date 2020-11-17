@@ -17,18 +17,8 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', validatePostId, (req, res) => {
-    Posts.getById(req.params.id)
-        .then((posts) => {
-            res.status(200).json(req.post)
-        })
-        .catch((error) => {
-            res.status(500).json({
-                message: "Unable to retrieve posts"
-            })
-        })
+    res.json(req.hub)
 });
-
-
 
 router.delete('/:id', validatePostId, (req, res) => {
     Posts.remove(req.params.id)
