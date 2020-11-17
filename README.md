@@ -27,6 +27,8 @@
 * /posts/[id]
 
 ### POST
+* /auth/register
+* /auth/login
 * /[user_id]/posts
 
 ### PUT
