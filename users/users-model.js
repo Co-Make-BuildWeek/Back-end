@@ -31,13 +31,21 @@ function getUserPosts(userId) {
       .where('p.user_id', userId);
   }
 
-function insert(user){
+async function insert(user){
+    const [id] = await db('users').insert(user, 'id');
+
     return db('users')
-        .insert(user)
-        .then(ids => {
-            return getById(ids[0]);
-        });
+        .where({id})
+        .first();
 }
+
+  // async function insert(user){
+//     return db('users')
+//         .insert(user)
+//         .then(ids => {
+//             return getById(ids[0]);
+//         });
+// }
 
 function update(id, changes){
     return db('users')
