@@ -1,4 +1,3 @@
-const e = require('express');
 const express = require('express');
 const router = express.Router();
 const Posts = require('./post-model');
@@ -32,19 +31,20 @@ router.put('/:id', validatePostId, (req, res) => {
         })
 });
 
-function validatePostId(req, res, next){
-    const {id} = req.params
+function validatePostId(req, res, next) {
+    const { id } = req.params;
     Posts.getById(id)
-        .then(post => {
-            if(post){
-                req.hub = post
-                next()
-            } else {
-                res.status(404).json({
-                    message: "Unable to find post with given ID"
-                })
-            }
-        }) 
-}
+      .then(post => {
+        if (post) {
+          req.post = post;
+          next();
+        } else {
+          next({ code: 400, message: "there are no posts with the given ID" });
+        }
+      })
+      .catch(error => {
+        next({ code: 500, message: error.message });
+      });
+  }
 
 module.exports = router;
