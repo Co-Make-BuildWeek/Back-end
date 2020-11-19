@@ -29,7 +29,7 @@
 ### POST
 * /auth/register
 * /auth/login
-* /[user_id]/posts
+* users/[user_id]/posts
 
 ### PUT
 * /[user_id]
