@@ -1,43 +1,29 @@
 const express = require('express');
 const Users = require('./users-model');
+const Posts = require('../posts/post-model');
 const router = express.Router();
 
-router.post('/', validateUser, (req, res) => {
-    const data = req.body
+router.post("/", validateUser, (req, res) => {
+    Users.insert(req.body)
+      .then(user => {
+        console.log(user);
+        res.status(201).json(user);
+      })
+      .catch(err => {
+        res.status(500).json({ message: err.message });
+      });
+  });
 
-    Users.insert(data)
-        .then(users => {
-            if(users){
-                res.status(201).json(users)
-            } else {
-                res.status(400).json({
-                    errorMessage: "Please provide a name for user"
-                })
-            }
-        })
-        .catch(error => {
-            console.log(error)
-            res.status(500).json({
-                error: "There was an error saving the user" 
-            })
-        })
-});
-
-router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
-    const {name} = req.body
-
-    if(!req.body.name){
-        return res.status(400).json({
-            errorMessage: "Please provide a name for the post"
-        })
-    }
-    Users.insert({name})
-        .then(users => {
-            res.status(404).json({
-                message: "The user with the specific ID does not exist"
-            })
-        })
-});
+router.post("/:id/posts", validateUserId, validatePost, (req, res) => {
+    Posts.insert({ ...req.body, user_id: req.params.id })
+      .then(post => {
+        res.status(201).json(post);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({ message: err.message });
+      });
+  });
 
 router.get('/', (req, res) => {
     Users.get(req.query)
@@ -136,42 +122,39 @@ router.put('/:id', validateUserId, validateUser, (req, res) => {
         })
 });
 
-function validateUserId(req, res, next){
-    const {id} = req.params;
-
-    Users.getById(id)
-        .then(data => {
-            if(data){
-                return next()
-            } else {
-                return res.status(404).json({
-                    message: `User with ${id} not found`
-                })
-            }
-        })
-        .catch(error => {
-            console.log(error.message)
-            next({code: 500, message: 'Something went wrong'})
-        })
-}
-
-function validateUser(req, res, next){
-    if(!req.body){
-        return res.status(400).json({message: "Missing user data"})
-    } else if (!req.body.name){
-        return res.status(400).json({message: "Missing required name field"})
-    }
-    next();
-}
-
-function validatePost(req, res, next){
-    if(req.body.name){
+async function validateUserId(req, res, next) {
+    const { id } = req.params;
+    try {
+      const user = await Users.getById(id);
+      if (user) {
+        req.user = user;
         next();
-    } else if(!req.body){
-        return res.status(400).json({message: "Missing user data"})
-    } else {
-        return res.status(400).json({message: "Missing required post"})
+      } else {
+        next({ code: 400, message: "invalid user id" });
+      }
+    } catch (error) {
+      next({ code: 500, message: error.message });
     }
-}
+  }
+
+function validateUser(req, res, next) {
+    if (!req.body) {
+      next({ code: 400, message: "missing user data" });
+    } else if (!req.body.name || typeof req.body.name !== "string") {
+      next({ code: 400, message: "missing required name field" });
+    } else {
+      next();
+    }
+  }
+
+function validatePost(req, res, next) {
+    if (!req.body) {
+      next({ code: 400, message: "missing post data" });
+    } else if (!req.body.description || typeof req.body.description !== "string") {
+      next({ code: 400, message: "missing required description field" });
+    } else {
+      next();
+    }
+  }
 
 module.exports = router;
